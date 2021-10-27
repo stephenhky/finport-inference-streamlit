@@ -116,5 +116,5 @@ col2.markdown('[Download image]({})'.format(plot_url))
 
 # Data display
 st.title('Data')
-st.markdown('[Download Exel]({})'.format(spreadsheet_url))
+st.markdown('[Download Excel]({})'.format(spreadsheet_url))
 st.dataframe(worthdf)
