@@ -48,7 +48,8 @@ async def get_symbol_plot_data(symbol, startdate, enddate):
     result = json.loads(response.text)
     data = result['data']
     plot_url = result['plot']['url']
-    return pd.DataFrame.from_records(data), plot_url
+    spreadsheet_url = result['spreadsheet']['url']
+    return pd.DataFrame.from_records(data), plot_url, spreadsheet_url
 
 
 # load symbols
@@ -82,7 +83,7 @@ upside_risk = symbol_estimate['upside_risk']
 beta = symbol_estimate['beta']
 
 # making portfolio and time series
-worthdf, plot_url = asyncio.run(task_values_over_time)
+worthdf, plot_url, spreadsheet_url = asyncio.run(task_values_over_time)
 
 # display
 col1, col2 = st.beta_columns((2, 1))
@@ -115,4 +116,5 @@ col2.markdown('[Download image]({})'.format(plot_url))
 
 # Data display
 st.title('Data')
+st.markdown('[Download Exel]({})'.format(spreadsheet_url))
 st.dataframe(worthdf)
