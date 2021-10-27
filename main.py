@@ -86,7 +86,7 @@ beta = symbol_estimate['beta']
 worthdf, plot_url, spreadsheet_url = asyncio.run(task_values_over_time)
 
 # display
-col1, col2 = st.beta_columns((2, 1))
+col1, col2 = st.columns((2, 1))
 
 # plot
 f = plt.figure()
