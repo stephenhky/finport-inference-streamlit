@@ -61,7 +61,8 @@ allsymbol_info = {item['symbol']: item for item in allsymbol_info}
 st.sidebar.title('Symbols')
 symbol = st.sidebar.selectbox(
     'Choose a symbol',
-    symbols
+    symbols,
+    "VOO"
 )
 i_startdate = st.sidebar.date_input('Start Date', value=date(2021, 1, 6))
 i_enddate = st.sidebar.date_input('End Date', value=date.today())
