@@ -54,15 +54,14 @@ async def get_symbol_plot_data(symbol, startdate, enddate):
 
 # load symbols
 allsymbol_info = json.load(open('exhaustive_allsymdf.json', 'r'))
-symbols = [item['symbol'] for item in allsymbol_info]
+symbols = ['VOO'] + [item['symbol'] for item in allsymbol_info if item['symbol'] != 'VOO']
 allsymbol_info = {item['symbol']: item for item in allsymbol_info}
 
 
 st.sidebar.title('Symbols')
 symbol = st.sidebar.selectbox(
     'Choose a symbol',
-    symbols,
-    "VOO"
+    symbols
 )
 i_startdate = st.sidebar.date_input('Start Date', value=date(2021, 1, 6))
 i_enddate = st.sidebar.date_input('End Date', value=date.today())
