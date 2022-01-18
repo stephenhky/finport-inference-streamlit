@@ -104,13 +104,13 @@ col1.pyplot(f, height=30)
 
 # inference
 col2.title('Inference')
-col2.text('yield = {:.4f} (annually {:.2f}%)'.format(r, convert_expreturn_to_annualreturn(r)*100))
-col2.text('volatility = {:.4f}'.format(sigma))
-col2.text('downside risk = {:.4f}'.format(downside_risk))
-col2.text('upside risk = {:.4f}'.format(upside_risk))
+col2.write('yield = {:.4f} (annually {:.2f}%)'.format(r, convert_expreturn_to_annualreturn(r)*100))
+col2.write('volatility = {:.4f}'.format(sigma))
+col2.write('downside risk = {:.4f}'.format(downside_risk))
+col2.write('upside risk = {:.4f}'.format(upside_risk))
 if beta is not None:
-    col2.text('beta (w.r.t. {}) = {:.4f}'.format(index, beta))
-col2.text('Name: {}'.format(allsymbol_info[symbol]['description']))
+    col2.write('beta (w.r.t. {}) = {:.4f}'.format(index, beta))
+col2.write('Name: {}'.format(allsymbol_info[symbol]['description']))
 col2.markdown('Symbol: [{sym:}](https://finance.yahoo.com/quote/{sym:})'.format(sym=symbol))
 col2.markdown('[Download image]({})'.format(plot_url))
 
