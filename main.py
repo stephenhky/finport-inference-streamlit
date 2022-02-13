@@ -66,7 +66,7 @@ symbol = st.sidebar.selectbox(
 i_startdate = st.sidebar.date_input('Start Date', value=date(2021, 1, 6))
 i_enddate = st.sidebar.date_input('End Date', value=date.today())
 
-index = 'VOO'
+index = '^GSPC'
 startdate = i_startdate.strftime('%Y-%m-%d')
 enddate = i_enddate.strftime('%Y-%m-%d')
 
