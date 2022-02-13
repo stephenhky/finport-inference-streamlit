@@ -15,7 +15,7 @@ def convert_expreturn_to_annualreturn(r):  # in the units of year
     return exp(r)-1
 
 
-async def get_symbol_estimations(symbol, startdate, enddate, index='DJI'):
+async def get_symbol_estimations(symbol, startdate, enddate, index='^GSPC'):
     url = "https://1phrvfsc16.execute-api.us-east-1.amazonaws.com/default/fininfoestimate"
 
     payload = json.dumps({
