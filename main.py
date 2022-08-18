@@ -53,7 +53,7 @@ async def get_symbol_plot_data(symbol, startdate, enddate):
 
 
 # load symbols
-allsymbol_info = json.load(open('exhaustive_allsymdf.json', 'r'))
+allsymbol_info = json.load(open('allsymdf.json', 'r'))
 symbols = ['VOO'] + [item['symbol'] for item in allsymbol_info if item['symbol'] != 'VOO']
 allsymbol_info = {item['symbol']: item for item in allsymbol_info}
 
