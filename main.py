@@ -102,7 +102,7 @@ if st.sidebar.button('Compute!'):
     step = len(xticks) // 10
     plt.xticks(xticks[::step])
     plt.legend([stockline, totalline], ['stock', 'stock+dividend'])
-    col1.pyplot(f, height=30)
+    col1.pyplot(f)
 
     # inference
     col2.title('Inference')
