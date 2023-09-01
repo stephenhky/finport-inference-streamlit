@@ -84,8 +84,6 @@ symbol = st.sidebar.selectbox(
 i_startdate = st.sidebar.date_input('Start Date', value=date(2021, 1, 6))
 i_enddate = st.sidebar.date_input('End Date', value=date.today())
 
-plottype = st.sidebar.radio('Stock+Dividend', ['Stock+Dividend', 'Moving Averages'])
-
 if st.sidebar.button('Compute!'):
 
     index = '^GSPC'
@@ -106,28 +104,26 @@ if st.sidebar.button('Compute!'):
     beta = symbol_estimate['beta']
 
     # making portfolio and time series
-    worthdf, plot_url, spreadsheet_url = asyncio.run(task_values_over_time)
+    worthdf, stockdividend_ploturl, spreadsheet_url = asyncio.run(task_values_over_time)
     maploturl = asyncio.run(task_maplot)
 
     # display
     col1, col2 = st.columns((2, 1))
 
     # plot
-    if plottype == 'Stock+Dividend':
-        f = plt.figure()
-        f.set_figwidth(10)
-        f.set_figheight(8)
-        plt.xlabel('Date')
-        plt.ylabel('Portfolio Value')
-        stockline, = plt.plot(worthdf['TimeStamp'], worthdf['stock_value'], label='stock', linewidth=0.75)
-        totalline, = plt.plot(worthdf['TimeStamp'], worthdf['value'], label='stock+dividend', linewidth=0.75)
-        xticks, _ = plt.xticks(rotation=90)
-        step = len(xticks) // 10
-        plt.xticks(xticks[::step])
-        plt.legend([stockline, totalline], ['stock', 'stock+dividend'])
-        col1.pyplot(f)
-    elif plottype == 'Moving Averages':
-        col1.image(maploturl)
+    f = plt.figure()
+    f.set_figwidth(10)
+    f.set_figheight(8)
+    plt.xlabel('Date')
+    plt.ylabel('Portfolio Value')
+    stockline, = plt.plot(worthdf['TimeStamp'], worthdf['stock_value'], label='stock', linewidth=0.75)
+    totalline, = plt.plot(worthdf['TimeStamp'], worthdf['value'], label='stock+dividend', linewidth=0.75)
+    xticks, _ = plt.xticks(rotation=90)
+    step = len(xticks) // 10
+    plt.xticks(xticks[::step])
+    plt.legend([stockline, totalline], ['stock', 'stock+dividend'])
+    col1.pyplot(f)
+    col1.image(maploturl)
 
     # inference
     col2.title('Inference')
@@ -139,7 +135,8 @@ if st.sidebar.button('Compute!'):
         col2.write('beta (w.r.t. {}) = {:.4f}'.format(index, beta))
     col2.write('Name: {}'.format(allsymbol_info[symbol]['description']))
     col2.markdown('Symbol: [{sym:}](https://finance.yahoo.com/quote/{sym:})'.format(sym=symbol))
-    col2.markdown('[Download image]({})'.format(plot_url))
+    col2.markdown('[Download plot (stock+dividend)]({})'.format(stockdividend_ploturl))
+    col2.markdown('[Download moving average plot]({})'.format(maploturl))
 
     # Data display
     st.title('Data')
