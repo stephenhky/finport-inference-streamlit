@@ -52,6 +52,24 @@ async def get_symbol_plot_data(symbol, startdate, enddate):
     return pd.DataFrame.from_records(data), plot_url, spreadsheet_url
 
 
+async def get_ma_plots_info(symbol, startdate, enddate, dayswindow, title=None):
+    api_url = 'https://vwl0qcnnve.execute-api.us-east-1.amazonaws.com/default/finport-ma-plot'
+    payload = json.dumps({
+        'symbol': symbol,
+        'startdate': startdate,
+        'enddate': enddate,
+        'dayswindow': dayswindow,
+        'title': symbol if title is None else title
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    response = requests.request("GET", api_url, headers=headers, data=payload)
+    plot_info = json.loads(response.text)
+    return plot_info['plot']['url']
+
+
 # load symbols
 allsymbol_info = json.load(open('allsymdf.json', 'r'))
 symbols = ['VOO'] + [item['symbol'] for item in allsymbol_info if item['symbol'] != 'VOO']
@@ -66,6 +84,8 @@ symbol = st.sidebar.selectbox(
 i_startdate = st.sidebar.date_input('Start Date', value=date(2021, 1, 6))
 i_enddate = st.sidebar.date_input('End Date', value=date.today())
 
+plottype = st.sidebar.radio('Stock+Dividend', ['Stock+Dividend', 'Moving Averages'])
+
 if st.sidebar.button('Compute!'):
 
     index = '^GSPC'
@@ -75,6 +95,7 @@ if st.sidebar.button('Compute!'):
     # starting asyncio
     task_estimate_symbols = get_symbol_estimations(symbol, startdate, enddate, index)
     task_values_over_time = get_symbol_plot_data(symbol, startdate, enddate)
+    task_maplot = get_ma_plots_info(symbol, startdate, enddate, [50, 200], title=symbol)
 
     # estimation
     symbol_estimate = asyncio.run(task_estimate_symbols)
@@ -86,23 +107,27 @@ if st.sidebar.button('Compute!'):
 
     # making portfolio and time series
     worthdf, plot_url, spreadsheet_url = asyncio.run(task_values_over_time)
+    maploturl = asyncio.run(task_maplot)
 
     # display
     col1, col2 = st.columns((2, 1))
 
     # plot
-    f = plt.figure()
-    f.set_figwidth(10)
-    f.set_figheight(8)
-    plt.xlabel('Date')
-    plt.ylabel('Portfolio Value')
-    stockline, = plt.plot(worthdf['TimeStamp'], worthdf['stock_value'], label='stock', linewidth=0.75)
-    totalline, = plt.plot(worthdf['TimeStamp'], worthdf['value'], label='stock+dividend', linewidth=0.75)
-    xticks, _ = plt.xticks(rotation=90)
-    step = len(xticks) // 10
-    plt.xticks(xticks[::step])
-    plt.legend([stockline, totalline], ['stock', 'stock+dividend'])
-    col1.pyplot(f)
+    if plottype == 'Stock+Dividend':
+        f = plt.figure()
+        f.set_figwidth(10)
+        f.set_figheight(8)
+        plt.xlabel('Date')
+        plt.ylabel('Portfolio Value')
+        stockline, = plt.plot(worthdf['TimeStamp'], worthdf['stock_value'], label='stock', linewidth=0.75)
+        totalline, = plt.plot(worthdf['TimeStamp'], worthdf['value'], label='stock+dividend', linewidth=0.75)
+        xticks, _ = plt.xticks(rotation=90)
+        step = len(xticks) // 10
+        plt.xticks(xticks[::step])
+        plt.legend([stockline, totalline], ['stock', 'stock+dividend'])
+        col1.pyplot(f)
+    elif plottype == 'Moving Averages':
+        col1.image(maploturl)
 
     # inference
     col2.title('Inference')
