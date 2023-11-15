@@ -70,6 +70,8 @@ async def get_ma_plots_info(symbol, startdate, enddate, dayswindow, title=None):
     return plot_info['plot']['url']
 
 
+st.set_page_config(page_title='Financial Parameter Fitting')
+
 # load symbols
 allsymbol_info = json.load(open('allsymdf.json', 'r'))
 symbols = ['VOO'] + [item['symbol'] for item in allsymbol_info if item['symbol'] != 'VOO']
