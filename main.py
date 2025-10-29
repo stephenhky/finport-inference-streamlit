@@ -1,5 +1,6 @@
 
 import json
+import os
 from datetime import date
 from math import exp
 
@@ -8,6 +9,10 @@ import pandas as pd
 import requests
 import streamlit as st
 from matplotlib import pyplot as plt
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 
@@ -16,56 +21,56 @@ def convert_expreturn_to_annualreturn(r):  # in the units of year
 
 
 async def get_symbol_estimations(symbol, startdate, enddate, index='^GSPC'):
-    url = "https://1phrvfsc16.execute-api.us-east-1.amazonaws.com/default/fininfoestimate"
+    url = os.environ.get("FININFO")
 
-    payload = json.dumps({
+    payload = {
         "symbol": symbol,
         "startdate": startdate,
         "enddate": enddate,
         "index": index
-    })
+    }
     headers = {
         'Content-Type': 'application/json'
     }
 
-    response = requests.request("GET", url, headers=headers, data=payload)
+    response = requests.request("GET", url, headers=headers, params=payload)
     return json.loads(response.text)
 
 
 async def get_symbol_plot_data(symbol, startdate, enddate):
-    url = "https://ed0lbq7vph.execute-api.us-east-1.amazonaws.com/default/finportplot"
+    url = os.environ.get("STOCKPLOT")
 
-    payload = json.dumps({
+    payload = {
+        'symbol': symbol,
         'startdate': startdate,
-        'enddate': enddate,
-        'components': {symbol: 1}
-    })
+        'enddate': enddate
+    }
     headers = {
         'Content-Type': 'text/plain'
     }
 
-    response = requests.request("GET", url, headers=headers, data=payload)
+    response = requests.request("GET", url, headers=headers, params=payload)
     result = json.loads(response.text)
-    data = result['data']
     plot_url = result['plot']['url']
     spreadsheet_url = result['spreadsheet']['url']
-    return pd.DataFrame.from_records(data), plot_url, spreadsheet_url
+    worthdf = pd.read_excel(spreadsheet_url)
+    return worthdf, plot_url, spreadsheet_url
 
 
 async def get_ma_plots_info(symbol, startdate, enddate, dayswindow, title=None):
-    api_url = 'https://vwl0qcnnve.execute-api.us-east-1.amazonaws.com/default/finport-ma-plot'
-    payload = json.dumps({
+    api_url = os.environ.get("MAPLOT")
+
+    payload = {
         'symbol': symbol,
         'startdate': startdate,
         'enddate': enddate,
-        'dayswindow': dayswindow,
-        'title': symbol if title is None else title
-    })
+        'dayswindow': dayswindow
+    }
     headers = {
         'Content-Type': 'application/json'
     }
 
-    response = requests.request("GET", api_url, headers=headers, data=payload)
+    response = requests.request("GET", api_url, headers=headers, params=payload)
     plot_info = json.loads(response.text)
     return plot_info['plot']['url']
 
@@ -100,7 +105,7 @@ if st.sidebar.button('Compute!'):
     # estimation
     symbol_estimate = asyncio.run(task_estimate_symbols)
     r = symbol_estimate['r']
-    sigma = symbol_estimate['vol']
+    sigma = symbol_estimate['volatility']
     downside_risk = symbol_estimate['downside_risk']
     upside_risk = symbol_estimate['upside_risk']
     beta = symbol_estimate['beta']
